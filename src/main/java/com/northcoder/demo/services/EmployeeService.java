@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import com.northcoder.demo.repositories.DemoRepository;
 import com.northcoder.demo.services.request.Column;
 import com.northcoder.demo.services.request.OrderCol;
+import java.text.Collator;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Locale;
 import org.apache.commons.collections4.ComparatorUtils;
 
 @Service
@@ -32,7 +35,7 @@ public class EmployeeService {
 
         // interim results to get total rows after filtering:
         List<Employee> filtered = all.stream()
-                .filter(containsText(ssr.search().value().toLowerCase()))
+                .filter(containsText(normalize(ssr.search().value().toLowerCase())))
                 .toList();
 
         // one page of results:
@@ -49,30 +52,32 @@ public class EmployeeService {
         // for multi-column sorting:
         List<Comparator<Employee>> sortChain = new ArrayList<>();
         for (OrderCol oc : ssr.order()) {
-            sortChain.add(buildComparatorClause(oc, ssr.columns()));
+            sortChain.add(buildComparatorClause(oc, ssr.columns(), getCollator()));
         }
         // combines list of comparators into one comparator:
         return ComparatorUtils.chainedComparator(sortChain);
     }
 
-    private Comparator<Employee> buildComparatorClause(OrderCol oc, List<Column> columns) {
+    private Comparator<Employee> buildComparatorClause(OrderCol oc, List<Column> columns,
+            Collator coll) {
+
         // default sort:
-        Comparator<Employee> comp = Comparator.comparing(Employee::name);
+        Comparator<Employee> comp = Comparator.comparing(Employee::name, coll);
         // which field to sort on - get column data name from column index:
         String colName = columns.get(oc.column()).data();
         switch (colName) {
             case "name" ->
-                comp = Comparator.comparing(Employee::name);
+                comp = Comparator.comparing(Employee::name, coll);
             case "position" ->
-                comp = Comparator.comparing(Employee::position);
+                comp = Comparator.comparing(Employee::position, coll);
             case "office" ->
-                comp = Comparator.comparing(Employee::office);
+                comp = Comparator.comparing(Employee::office, coll);
             case "age" ->
-                comp = Comparator.comparing(Employee::age);
+                comp = Comparator.comparing(Employee::age, coll);
             case "startDate" ->
-                comp = Comparator.comparing(Employee::startDate);
+                comp = Comparator.comparing(Employee::startDate, coll);
             case "salary" ->
-                comp = Comparator.comparing(Employee::salary);
+                comp = Comparator.comparing(Employee::salary, coll);
         }
         // ascending or descending:
         return oc.dir().equals("asc") ? comp : comp.reversed();
@@ -80,12 +85,27 @@ public class EmployeeService {
 
     private Predicate<Employee> containsText(String searchTerm) {
         // search all fields for case-insensitive search term:
-        return e -> e.name().toLowerCase().contains(searchTerm)
-                || e.position().toLowerCase().contains(searchTerm)
-                || e.office().toLowerCase().contains(searchTerm)
-                || String.valueOf(e.age()).toLowerCase().contains(searchTerm)
-                || e.startDate().toString().toLowerCase().contains(searchTerm)
-                || e.salary().toLowerCase().contains(searchTerm);
+        return e -> normalize(e.name().toLowerCase()).contains(searchTerm)
+                || normalize(e.position().toLowerCase()).contains(searchTerm)
+                || normalize(e.office().toLowerCase()).contains(searchTerm)
+                || normalize(String.valueOf(e.age()).toLowerCase()).contains(searchTerm)
+                || normalize(e.startDate().toString().toLowerCase()).contains(searchTerm)
+                || normalize(e.salary().toLowerCase()).contains(searchTerm);
+    }
+
+    private Collator getCollator() {
+        Collator coll = Collator.getInstance(Locale.US);
+        coll.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
+        return coll;
+    }
+
+    private String normalize(String input) {
+        if (input == null) {
+            return null;
+        }
+        // NFD = canonical decomposition; \p{Mn} = non-spacing marks:
+        return Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{Mn}", "");
     }
 
 }
