@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Demo</title>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+        <link rel="stylesheet" type="text/css" href="https://datatables.net/media/css/site-examples.css">
+    </head>
+
+    <body>
+
+        <div style="margin: 20px;">
+
+            <table id="example" class="display dataTable cell-border" style="width:100%"></table>
+
+        </div>
+
+        <script type="text/javascript">
+
+            $(function () {
+
+                $('#example').DataTable({
+                    serverSide: true,
+                    processing: true,
+                    ajax: {
+                        url: "http://localhost:8080/demo/listing",
+                        type: "post",
+                        contentType: "application/json",
+                        data: function (d) {
+                            //d.saved_state = $('#example').DataTable().settings();
+                            return JSON.stringify(d);
+                        }
+                    },
+                    columns: [
+                        {title: "Name", data: "name"},
+                        {title: "Position", data: "position"},
+                        {title: "Office", data: "office"},
+                        {title: "Age", data: "age"},
+                        {title: "Start Date", data: "startDate"},
+                        {title: "Salary", data: "salary"}
+                    ]
+                });
+
+            });
+
+        </script>
+
+    </body>
+</html>
