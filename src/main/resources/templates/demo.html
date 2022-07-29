@@ -17,19 +17,19 @@
 
         </div>
 
-        <script type="text/javascript">
+        <script>
 
             $(function () {
 
                 $('#example').DataTable({
                     serverSide: true,
                     processing: true,
+                    searchDelay: 500,
                     ajax: {
                         url: "http://localhost:8080/demo/listing",
-                        type: "post",
+                        type: "POST",
                         contentType: "application/json",
                         data: function (d) {
-                            //d.saved_state = $('#example').DataTable().settings();
                             return JSON.stringify(d);
                         }
                     },
