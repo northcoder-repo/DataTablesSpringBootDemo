@@ -22,3 +22,5 @@ If you want to use the DataTables [Search Builder](https://datatables.net/extens
 ---
 
 If I were going to refactor this to reduce the burden of always using `demoRepository.findAll()`, I would build a dynamically constructed JDBC prepared statement, executed via Spring's `JdbcTemplate`. In my case, because my demo uses MySQL, I would consider using its `LIMIT` and `OFFSET` clauses. But I would be aware that other databases may have different syntax for these (or maybe even no syntax at all).
+
+See also [Another Spring Boot Demo for DataTables Server-Side Processing](https://northcoder.com/post/another-spring-boot-demo-for-datata/), which is one such approach.
