@@ -6,7 +6,7 @@ public record Employee(
         String name,
         String position,
         String office,
-        int age,
+        Integer age,
         LocalDate startDate,
         String salary) {
 

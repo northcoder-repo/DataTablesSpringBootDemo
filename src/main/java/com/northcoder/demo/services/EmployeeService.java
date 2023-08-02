@@ -1,20 +1,20 @@
 package com.northcoder.demo.services;
 
 import com.northcoder.demo.entities.Employee;
-import com.northcoder.demo.services.request.ServerSideRequest;
-import jakarta.inject.Inject;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Predicate;
-import org.springframework.stereotype.Service;
 import com.northcoder.demo.repositories.DemoRepository;
 import com.northcoder.demo.services.request.Column;
 import com.northcoder.demo.services.request.OrderCol;
+import com.northcoder.demo.services.request.ServerSideRequest;
+import jakarta.inject.Inject;
 import java.text.Collator;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 import org.apache.commons.collections4.ComparatorUtils;
+import org.springframework.stereotype.Service;
 
 @Service
 public class EmployeeService {
@@ -85,12 +85,12 @@ public class EmployeeService {
 
     private Predicate<Employee> containsText(String searchTerm) {
         // search all fields for case-insensitive search term:
-        return e -> normalize(e.name().toLowerCase()).contains(searchTerm)
-                || normalize(e.position().toLowerCase()).contains(searchTerm)
-                || normalize(e.office().toLowerCase()).contains(searchTerm)
-                || normalize(String.valueOf(e.age()).toLowerCase()).contains(searchTerm)
-                || normalize(e.startDate().toString().toLowerCase()).contains(searchTerm)
-                || normalize(e.salary().toLowerCase()).contains(searchTerm);
+        return e -> (e.name() != null && normalize(e.name().toLowerCase()).contains(searchTerm))
+                || (e.position() != null && normalize(e.position().toLowerCase()).contains(searchTerm))
+                || (e.office() != null && normalize(e.office().toLowerCase()).contains(searchTerm))
+                || (e.age() != null && normalize(String.valueOf(e.age()).toLowerCase()).contains(searchTerm))
+                || (e.startDate() != null && normalize(e.startDate().toString().toLowerCase()).contains(searchTerm))
+                || (e.salary() != null && normalize(e.salary().toLowerCase()).contains(searchTerm));
     }
 
     private Collator getCollator() {
